@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>HEP Desktop Transcriber v1.0</title>
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --bg-secondary: #111827;
+      --panel: #1a1f2e;
+      --panel-hover: #252b3d;
+      --panel-2: #252b3d;
+      --text: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-light: rgba(59, 130, 246, 0.1);
+      --danger: #ef4444;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --border: #2d3548;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      letter-spacing: -0.01em;
+    }
+
+    /* Header */
+    header {
+      background: var(--panel);
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(10px);
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .sub {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+      font-weight: 400;
+    }
+
+    /* Main container - mobile first */
+    main {
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto 100px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-md);
+      transition: all 0.2s ease;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-lg);
+      border-color: var(--panel-hover);
+    }
+
+    /* Form elements */
+    input[type="file"],
+    input[type="number"],
+    input[type="text"],
+    select,
+    button {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      margin: 8px 0;
+      cursor: pointer;
+    }
+
+    input[type="file"]:hover {
+      border-color: var(--accent);
+      background: var(--panel-hover);
+    }
+
+    input[type="number"] {
+      width: 70px;
+    }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    input[type="text"] {
+      width: 100%;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      background: var(--bg-secondary);
+      border-radius: 3px;
+      outline: none;
+      border: none;
+      padding: 0;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    input[type="range"]:hover::-webkit-slider-thumb {
+      background: var(--accent-hover);
+      box-shadow: 0 0 0 4px var(--accent-light);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    input[type="range"]:hover::-moz-range-thumb {
+      background: var(--accent-hover);
+      box-shadow: 0 0 0 4px var(--accent-light);
+    }
+
+    select {
+      min-width: 0;
+      flex: 1;
+      cursor: pointer;
+    }
+
+    select:hover {
+      border-color: var(--accent);
+      background: var(--panel-hover);
+    }
+
+    button {
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: all 0.2s ease;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    button:hover {
+      background: var(--panel-hover);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    button.primary {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+      font-weight: 600;
+      box-shadow: var(--shadow-sm);
+    }
+    button.primary:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+      box-shadow: var(--shadow-md);
+    }
+    button.ghost {
+      background: transparent;
+      border-color: var(--border);
+    }
+    button.ghost:hover {
+      background: var(--panel-hover);
+      border-color: var(--accent);
+    }
+    button.danger {
+      background: var(--danger);
+      color: white;
+      border-color: var(--danger);
+    }
+    button.danger:hover {
+      background: #dc2626;
+      border-color: #dc2626;
+    }
+
+    #enableAutoSaveBtn:hover:not(:disabled) {
+      background: var(--panel-hover);
+      box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
+      transform: translateY(-1px);
+    }
+
+    /* Audio controls section */
+    .audio-info {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .audio-settings {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .time-display {
+      margin-left: auto;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* Waveform */
+    #waveformCanvas {
+      width: 100%;
+      height: 60px;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      margin: 8px 0;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: border-color 0.2s ease;
+    }
+
+    #waveformCanvas:hover {
+      border-color: var(--accent);
+    }
+
+    /* Progress bar */
+    .progress-container {
+      margin: 12px 0;
+      position: relative;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--bg-secondary);
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .progress-bar::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .progress-bar:hover::-webkit-slider-thumb {
+      background: var(--accent-hover);
+      box-shadow: 0 0 0 4px var(--accent-light);
+    }
+
+    .progress-bar:active::-webkit-slider-thumb {
+      transform: scale(1.2);
+    }
+
+    .progress-bar::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .progress-bar:hover::-moz-range-thumb {
+      background: var(--accent-hover);
+      box-shadow: 0 0 0 4px var(--accent-light);
+    }
+
+    .progress-bar:active::-moz-range-thumb {
+      transform: scale(1.2);
+    }
+
+    .progress-time {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .seek-preview {
+      position: absolute;
+      top: -30px;
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      white-space: nowrap;
+      box-shadow: var(--shadow-md);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .seek-preview.visible {
+      opacity: 1;
+    }
+
+    /* Main control buttons - two rows on mobile */
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .controls-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .controls button {
+      padding: 12px 8px;
+      font-weight: 600;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+
+    .controls .wide {
+      grid-column: span 1;
+    }
+
+    /* Loop info */
+    .loop-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* Editor */
+    textarea {
+      width: 100%;
+      min-height: 40vh;
+      resize: vertical;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 16px;
+      border-radius: 12px;
+      line-height: 1.6;
+      font-size: 15px;
+      font-family: inherit;
+      margin: 8px 0;
+      transition: all 0.2s ease;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+      background: var(--panel-2);
+    }
+
+    /* Search bar */
+    .search-container {
+      display: flex;
+      gap: 8px;
+      margin: 8px 0;
+    }
+
+    .search-container input {
+      flex: 1;
+    }
+
+    .search-container button {
+      padding: 10px 16px;
+    }
+
+    /* Editor toolbar - 2 column grid on mobile */
+    .toolbar {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .toolbar button,
+    .toolbar select {
+      padding: 10px;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+
+    /* Status indicators */
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--success);
+      color: white;
+      font-weight: 600;
+      font-size: 11px;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge.error {
+      background: var(--danger);
+      color: white;
+    }
+    .badge.warning {
+      background: var(--warning);
+      color: #1a0f00;
+    }
+
+    /* Toast notifications */
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: var(--panel);
+      color: var(--text);
+      padding: 14px 24px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      max-width: 90%;
+      text-align: center;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(10px);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast.success {
+      border-color: var(--success);
+      background: color-mix(in srgb, var(--success) 15%, var(--panel));
+    }
+
+    .toast.error {
+      border-color: var(--danger);
+      background: color-mix(in srgb, var(--danger) 15%, var(--panel));
+    }
+
+    .toast.warning {
+      border-color: var(--warning);
+      background: color-mix(in srgb, var(--warning) 15%, var(--panel));
+    }
+
+    /* Help section */
+    .hint {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .hint ul {
+      margin: 8px 0;
+      padding-left: 20px;
+    }
+    .hint li {
+      margin: 4px 0;
+    }
+
+    .kbd {
+      background: #111;
+      border: 1px solid #333;
+      border-bottom-width: 2px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 11px;
+      display: inline-block;
+    }
+
+    /* Labels */
+    .label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .section-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: block;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+      padding: 20px 12px 120px;
+    }
+
+    /* Mobile dock */
+    .mobile-dock {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 50;
+      background: var(--panel);
+      border-top: 1px solid var(--border);
+      padding: 8px 12px;
+      box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+    }
+    .dock-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .mobile-dock button {
+      padding: 14px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    /* Environment warning */
+    .warning {
+      background: color-mix(in srgb, var(--danger) 30%, var(--bg));
+      color: white;
+      padding: 12px 16px;
+      font-size: 13px;
+      line-height: 1.5;
+      border-radius: 8px;
+      border: 1px solid var(--danger);
+    }
+
+    /* Tablet and desktop adjustments */
+    @media (min-width: 640px) {
+      main {
+        padding: 16px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      /* Desktop - single row controls */
+      .controls {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 8px;
+      }
+
+      .controls-row {
+        display: contents;
+      }
+
+      /* 4 column grid for toolbar on larger screens */
+      .toolbar {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .audio-settings {
+        flex-wrap: nowrap;
+      }
+
+      textarea {
+        min-height: 50vh;
+      }
+
+      .toast {
+        bottom: 40px;
+      }
+    }
+
+    /* Desktop layout adjustments */
+    @media (min-width: 880px) {
+      .mobile-dock {
+        display: none;
+      }
+
+      main {
+        margin-bottom: 40px;
+      }
+
+      /* Full width editor, help at bottom */
+      .editor-card {
+        width: 100%;
+      }
+
+      .help-card {
+        width: 100%;
+        margin-top: 0;
+      }
+
+      .footer {
+        padding-bottom: 40px;
+      }
+    }
+
+    /* Safe area insets for modern phones */
+    @supports (padding: max(0px)) {
+      body {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+      }
+      .mobile-dock {
+        padding-bottom: max(8px, env(safe-area-inset-bottom));
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>HEP Desktop Transcriber v1.0</h1>
+    <div class="sub">Play audio + type the transcript on one screen. Everything stays on your device (local only).</div>
+  </header>
+
+  <div id="envWarning" class="warning" style="display:none;">
+    If the file picker doesn't open: tap the three dots ··· and choose <strong>Open in Chrome</strong>, or copy the link and open it in Chrome. Some in‑app browsers (WhatsApp/Instagram/Twitter) block file uploads. Also make sure the audio is saved on the phone (Downloads/Files), not just online in Drive.
+  </div>
+
+  <!-- Toast notification -->
+  <div id="toast" class="toast"></div>
+
+  <main>
+    <!-- Audio controls card -->
+    <div class="card">
+      <div class="audio-info">
+        <div style="display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 200px;">
+            <label class="label" for="audioFile">1) Choose audio file</label>
+            <input id="audioFile" type="file" accept=".mp3,.m4a,.aac,.wav,.ogg,.oga,.3gp,.m4b,.mp4,.mov,.webm,audio/*,video/*" />
+          </div>
+          <button id="enableAutoSaveBtn" style="padding: 10px 14px; font-size: 14px; white-space: nowrap; border: 2px solid var(--danger); background: var(--panel-2); color: var(--text); border-radius: 8px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s ease; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2);">Enable Auto-save to File</button>
+        </div>
+        <div id="fileName" class="label"></div>
+
+        <div class="audio-settings">
+          <label class="label">Back secs</label>
+          <input id="skipBackSeconds" type="number" value="3" min="1" max="30" />
+          <label class="label">Fwd secs</label>
+          <input id="skipSeconds" type="number" value="5" min="1" max="30" />
+          <label class="label">Speed</label>
+          <select id="speed">
+            <option value="0.5">0.5×</option>
+            <option value="0.7">0.7×</option>
+            <option value="0.8">0.8×</option>
+            <option value="0.9">0.9×</option>
+            <option value="1" selected>1×</option>
+            <option value="1.1">1.1×</option>
+            <option value="1.25">1.25×</option>
+            <option value="1.5">1.5×</option>
+            <option value="2">2×</option>
+          </select>
+          <label class="label">Volume</label>
+          <input id="volumeSlider" type="range" min="0" max="100" value="100" style="width: 80px;" />
+          <span id="timeReadout" class="time-display">00:00 / 00:00</span>
+        </div>
+      </div>
+
+      <audio id="player" preload="metadata" style="width:0;height:0;opacity:0;position:absolute;pointer-events:none;" playsinline disablepictureinpicture controlslist="nodownload noplaybackrate noremoteplayback"></audio>
+
+      <!-- Waveform visualization -->
+      <canvas id="waveformCanvas"></canvas>
+
+      <!-- Progress bar -->
+      <div class="progress-container">
+        <div id="seekPreview" class="seek-preview"></div>
+        <input type="range" id="progressBar" class="progress-bar" min="0" max="100" value="0" step="0.1">
+        <div class="progress-time">
+          <span id="currentTime">00:00</span>
+          <span id="duration">00:00</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="controls-row">
+          <button id="backBtn">⏪ Back</button>
+          <button id="playBtn" class="primary">▶️ Play</button>
+          <button id="fwdBtn">⏩ Fwd</button>
+        </div>
+        <div class="controls-row">
+          <button id="setA">Set A</button>
+          <button id="setB">Set B</button>
+          <button id="toggleLoop">Loop: Off</button>
+        </div>
+      </div>
+
+      <div class="loop-info">
+        <div>Loop A: <span id="loopA">–</span> | B: <span id="loopB">–</span></div>
+        <div style="display: flex; gap: 16px; align-items: center;">
+          <label class="checkbox-label">
+            <input type="checkbox" id="autoPauseCheck" />
+            Auto-pause
+          </label>
+          <div>Autosave: <span class="badge" id="autosaveBadge">ON</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Editor card - full width on desktop -->
+    <div class="card editor-card">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="section-title">2) Type transcript here</span>
+        <span class="label" id="countInfo">0 chars</span>
+      </div>
+
+      <!-- Search bar -->
+      <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search in transcript..." />
+        <button id="searchPrev">↑</button>
+        <button id="searchNext">↓</button>
+      </div>
+
+      <textarea id="editor" placeholder="Type what you hear… You can insert timestamps, add speaker labels, and save when done."></textarea>
+
+      <div class="toolbar">
+        <button id="insertTs">Timestamp</button>
+        <select id="speakerPreset">
+          <option value="">Speaker…</option>
+          <option value="Interviewer:">Interviewer:</option>
+          <option value="Speaker:">Speaker:</option>
+          <option value="Speaker 1:">Speaker 1:</option>
+          <option value="Speaker 2:">Speaker 2:</option>
+        </select>
+        <button id="undoBtn">↶ Undo</button>
+        <button id="redoBtn">↷ Redo</button>
+        <button id="saveBtn">Save draft</button>
+        <button id="copyBtn">Copy text</button>
+        <button id="downloadBtn" class="primary wide">Export .txt</button>
+        <button id="downloadSrtBtn" class="wide">Export .srt</button>
+        <button id="markBtn" class="wide">Mark unclear</button>
+        <button id="importBtn">Import .txt</button>
+      </div>
+      <input id="importFile" type="file" accept=".txt" hidden />
+
+      <div class="status-row">
+        <div>Saved: <span id="saveStamp">never</span></div>
+        <div>Storage: <span id="persistStatus">checking…</span></div>
+      </div>
+
+      <div class="hint" style="margin-top: 12px;">
+        Tips: Use Back/Forward to skip (configurable amounts). Adjust volume and speed as needed. Set A and B define a loop. When you pause, audio automatically rewinds by the "Back secs" amount to help capture what was just said. Timestamp inserts the current audio time like [00:03:12]. Everything auto‑saves to browser storage. Ctrl+Shift+I for Interviewer, Ctrl+Shift+S for Speaker.
+      </div>
+    </div>
+
+    <!-- Help card - below editor on desktop -->
+    <div class="card help-card">
+      <span class="section-title">3) Quick help</span>
+      <div class="hint">
+        <ul>
+          <li>Load an <strong>audio file</strong> from your device (MP3, M4A, WAV, etc.).</li>
+          <li>Press <strong>Play</strong>, then pause and rewind to transcribe.</li>
+          <li><strong>Insert timestamp</strong> adds the current time to your text.</li>
+          <li><strong>Loop</strong>: Set A and B, then toggle Loop. Great for tricky parts.</li>
+          <li><strong>Rewind on Pause</strong>: When you pause, audio jumps back by "Back secs" amount (default 3s) to help you catch what was just said.</li>
+          <li><strong>Volume Control</strong>: Adjust playback volume with the slider in audio controls.</li>
+          <li><strong>Auto-pause</strong>: Automatically pauses when you start typing.</li>
+          <li><strong>Search</strong>: Find text in your transcript with the search bar.</li>
+          <li><strong>Undo/Redo</strong>: Track changes with custom history (Cmd/Ctrl+Z, Cmd/Ctrl+Shift+Z).</li>
+          <li><strong>Export .srt</strong>: Create subtitle files with timestamps.</li>
+          <li><strong>Waveform</strong>: Visual representation of audio helps identify speech.</li>
+          <li><strong>Autosave</strong> keeps your draft locally (works offline).</li>
+          <li><strong>Privacy</strong>: No uploads. Everything stays on your device.</li>
+        </ul>
+        <div style="margin-top: 8px;">
+          Keyboard shortcuts:
+          <span class="kbd">Shift+Space</span> Play/Pause (works while typing),
+          <span class="kbd">Esc</span> Exit text field,
+          <span class="kbd">←</span> / <span class="kbd">→</span> Skip,
+          <span class="kbd">Ctrl+Shift+I</span> Interviewer,
+          <span class="kbd">Ctrl+Shift+S</span> Speaker,
+          <span class="kbd">Ctrl+E</span> Export,
+          <span class="kbd">Ctrl+F</span> Find,
+          <span class="kbd">Ctrl+Z</span> Undo,
+          <span class="kbd">Ctrl+Shift+Z</span> Redo
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      HEP Desktop Transcriber v1.0 • Local‑only, single‑file tool<br>
+      © Hope Education Project Ghana 2025
+    </div>
+  </main>
+
+  <!-- Mobile dock -->
+  <div class="mobile-dock">
+    <div class="dock-grid">
+      <button id="dockBack">⏪ Back</button>
+      <button id="dockPlay" class="primary">▶️ Play</button>
+      <button id="dockFwd">⏩ Fwd</button>
+    </div>
+  </div>
+
+  <script>
+    // DOM elements
+    const player = document.getElementById('player');
+    const progressBar = document.getElementById('progressBar');
+    const seekPreview = document.getElementById('seekPreview');
+    const currentTimeDisplay = document.getElementById('currentTime');
+    const durationDisplay = document.getElementById('duration');
+    const audioFile = document.getElementById('audioFile');
+    const fileName = document.getElementById('fileName');
+    const backBtn = document.getElementById('backBtn');
+    const playBtn = document.getElementById('playBtn');
+    const fwdBtn = document.getElementById('fwdBtn');
+    const skipSeconds = document.getElementById('skipSeconds');
+    const speedSel = document.getElementById('speed');
+    const timeReadout = document.getElementById('timeReadout');
+    const setA = document.getElementById('setA');
+    const setB = document.getElementById('setB');
+    const toggleLoop = document.getElementById('toggleLoop');
+    const loopA = document.getElementById('loopA');
+    const loopB = document.getElementById('loopB');
+    const autoPauseCheck = document.getElementById('autoPauseCheck');
+    const editor = document.getElementById('editor');
+    const insertTs = document.getElementById('insertTs');
+    const speakerPreset = document.getElementById('speakerPreset');
+    const copyBtn = document.getElementById('copyBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const downloadSrtBtn = document.getElementById('downloadSrtBtn');
+    const markBtn = document.getElementById('markBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const importBtn = document.getElementById('importBtn');
+    const importFile = document.getElementById('importFile');
+    const saveStamp = document.getElementById('saveStamp');
+    const persistStatus = document.getElementById('persistStatus');
+    const autosaveBadge = document.getElementById('autosaveBadge');
+    const countInfo = document.getElementById('countInfo');
+    const dockBack = document.getElementById('dockBack');
+    const dockPlay = document.getElementById('dockPlay');
+    const dockFwd = document.getElementById('dockFwd');
+    const toastEl = document.getElementById('toast');
+    const searchInput = document.getElementById('searchInput');
+    const searchPrev = document.getElementById('searchPrev');
+    const searchNext = document.getElementById('searchNext');
+    const undoBtn = document.getElementById('undoBtn');
+    const redoBtn = document.getElementById('redoBtn');
+    const waveformCanvas = document.getElementById('waveformCanvas');
+    const waveformCtx = waveformCanvas.getContext('2d');
+    const enableAutoSaveBtn = document.getElementById('enableAutoSaveBtn');
+    const skipBackSeconds = document.getElementById('skipBackSeconds');
+    const volumeSlider = document.getElementById('volumeSlider');
+
+    // State variables
+    let loopStart = null;
+    let loopEnd = null;
+    let doLoop = false;
+    let currentFileKey = 'transcriber-default';
+    let currentAudioURL = null;
+    let lastSpeakerNumber = 0;
+    let searchMatches = [];
+    let currentSearchIndex = -1;
+    let autoPauseEnabled = false;
+    let wasPlayingBeforeTyping = false;
+    let autoSaveFileHandle = null;
+    let autoSaveInterval = null;
+    let autoSaveEnabled = false;
+
+    // Undo/redo stack
+    let undoStack = [];
+    let redoStack = [];
+    const MAX_UNDO_STACK = 50;
+
+    // Utility functions
+    function fmtTime(t) {
+      if (!isFinite(t)) return '00:00';
+      const h = Math.floor(t / 3600);
+      const m = Math.floor((t % 3600) / 60);
+      const s = Math.floor(t % 60);
+      const hh = h > 0 ? String(h).padStart(2, '0') + ':' : '';
+      return hh + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    }
+
+    function fmtTimeSrt(t) {
+      if (!isFinite(t)) return '00:00:00,000';
+      const h = Math.floor(t / 3600);
+      const m = Math.floor((t % 3600) / 60);
+      const s = Math.floor(t % 60);
+      const ms = Math.floor((t % 1) * 1000);
+      return String(h).padStart(2, '0') + ':' +
+             String(m).padStart(2, '0') + ':' +
+             String(s).padStart(2, '0') + ',' +
+             String(ms).padStart(3, '0');
+    }
+
+    function showToast(message, type = 'info', duration = 3000) {
+      toastEl.textContent = message;
+      toastEl.className = 'toast show ' + type;
+      setTimeout(() => {
+        toastEl.classList.remove('show');
+      }, duration);
+    }
+
+    function updateTimeReadout() {
+      timeReadout.textContent = `${fmtTime(player.currentTime)} / ${fmtTime(player.duration)}`;
+      currentTimeDisplay.textContent = fmtTime(player.currentTime);
+      durationDisplay.textContent = fmtTime(player.duration);
+    }
+
+    function updateProgress() {
+      if (player.duration) {
+        const percent = (player.currentTime / player.duration) * 100;
+        progressBar.value = percent;
+      }
+    }
+
+    function updateCounts() {
+      const text = editor.value;
+      const chars = text.length;
+      const words = (text.trim().match(/\S+/g) || []).length;
+      countInfo.textContent = window.innerWidth > 480
+        ? `${chars} chars • ${words} words`
+        : `${chars} chars`;
+    }
+
+    async function checkStorageQuota() {
+      try {
+        if (navigator.storage && navigator.storage.estimate) {
+          const estimate = await navigator.storage.estimate();
+          const percentUsed = (estimate.usage / estimate.quota) * 100;
+
+          if (percentUsed > 80) {
+            showToast(`Storage ${percentUsed.toFixed(0)}% full. Consider exporting your work.`, 'warning', 5000);
+            autosaveBadge.classList.add('warning');
+          }
+        }
+      } catch (e) {
+        console.warn('Storage quota check failed:', e);
+      }
+    }
+
+    function saveLocal() {
+      try {
+        localStorage.setItem(currentFileKey, editor.value);
+        localStorage.setItem('transcriber-active', editor.value);
+        autosaveBadge.textContent = 'ON';
+        autosaveBadge.classList.remove('error', 'warning');
+        if (saveStamp) saveStamp.textContent = new Date().toLocaleTimeString();
+        checkStorageQuota();
+      } catch (e) {
+        autosaveBadge.textContent = 'FAIL';
+        autosaveBadge.classList.add('error');
+        console.error('Autosave failed:', e);
+        showToast('Autosave failed. Storage may be full.', 'error');
+      }
+    }
+
+    function loadLocal() {
+      let v = localStorage.getItem(currentFileKey);
+      if (!v) v = localStorage.getItem('transcriber-active');
+      if (v) {
+        editor.value = v;
+        updateCounts();
+      }
+    }
+
+    // Undo/Redo functions
+    function pushUndoState(value) {
+      if (undoStack.length === 0 || undoStack[undoStack.length - 1] !== value) {
+        undoStack.push(value);
+        if (undoStack.length > MAX_UNDO_STACK) {
+          undoStack.shift();
+        }
+        redoStack = [];
+        updateUndoRedoButtons();
+      }
+    }
+
+    function undo() {
+      if (undoStack.length > 1) {
+        redoStack.push(undoStack.pop());
+        editor.value = undoStack[undoStack.length - 1];
+        updateCounts();
+        saveLocal();
+        updateUndoRedoButtons();
+      }
+    }
+
+    function redo() {
+      if (redoStack.length > 0) {
+        const state = redoStack.pop();
+        undoStack.push(state);
+        editor.value = state;
+        updateCounts();
+        saveLocal();
+        updateUndoRedoButtons();
+      }
+    }
+
+    function updateUndoRedoButtons() {
+      undoBtn.disabled = undoStack.length <= 1;
+      redoBtn.disabled = redoStack.length === 0;
+    }
+
+    // Search functionality
+    function performSearch() {
+      const query = searchInput.value.toLowerCase();
+      searchMatches = [];
+      currentSearchIndex = -1;
+
+      if (!query) {
+        editor.setSelectionRange(0, 0);
+        return;
+      }
+
+      const text = editor.value.toLowerCase();
+      let index = 0;
+
+      while ((index = text.indexOf(query, index)) !== -1) {
+        searchMatches.push(index);
+        index += query.length;
+      }
+
+      if (searchMatches.length > 0) {
+        currentSearchIndex = 0;
+        highlightMatch();
+        showToast(`Found ${searchMatches.length} match${searchMatches.length > 1 ? 'es' : ''}`, 'success', 2000);
+      } else {
+        showToast('No matches found', 'warning', 2000);
+      }
+    }
+
+    function highlightMatch() {
+      if (currentSearchIndex >= 0 && currentSearchIndex < searchMatches.length) {
+        const start = searchMatches[currentSearchIndex];
+        const end = start + searchInput.value.length;
+        editor.focus();
+        editor.setSelectionRange(start, end);
+        editor.scrollTop = editor.scrollHeight * (start / editor.value.length);
+      }
+    }
+
+    function searchNextMatch() {
+      if (searchMatches.length > 0) {
+        currentSearchIndex = (currentSearchIndex + 1) % searchMatches.length;
+        highlightMatch();
+      }
+    }
+
+    function searchPrevMatch() {
+      if (searchMatches.length > 0) {
+        currentSearchIndex = (currentSearchIndex - 1 + searchMatches.length) % searchMatches.length;
+        highlightMatch();
+      }
+    }
+
+    // Waveform visualization
+    async function drawWaveform(audioBuffer) {
+      const canvas = waveformCanvas;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = canvas.offsetWidth * dpr;
+      canvas.height = canvas.offsetHeight * dpr;
+      waveformCtx.scale(dpr, dpr);
+
+      const data = audioBuffer.getChannelData(0);
+      const step = Math.ceil(data.length / canvas.offsetWidth);
+      const amp = canvas.offsetHeight / 2;
+
+      waveformCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--panel-2');
+      waveformCtx.fillRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+
+      waveformCtx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent');
+      waveformCtx.lineWidth = 1;
+      waveformCtx.beginPath();
+
+      for (let i = 0; i < canvas.offsetWidth; i++) {
+        let min = 1.0;
+        let max = -1.0;
+        for (let j = 0; j < step; j++) {
+          const datum = data[(i * step) + j] || 0;
+          if (datum < min) min = datum;
+          if (datum > max) max = datum;
+        }
+        const yMin = (1 + min) * amp;
+        const yMax = (1 + max) * amp;
+
+        if (i === 0) {
+          waveformCtx.moveTo(i, yMin);
+        }
+        waveformCtx.lineTo(i, yMin);
+        waveformCtx.lineTo(i, yMax);
+      }
+
+      waveformCtx.stroke();
+    }
+
+    // Audio file handling
+    audioFile.addEventListener('change', async () => {
+      const f = audioFile.files?.[0];
+      if (!f) {
+        showToast('No file selected. If the picker didn\'t appear, open this page in Chrome (not an in‑app browser) and make sure the audio is stored locally.', 'error', 5000);
+        return;
+      }
+
+      // Check file size (warn if > 100MB)
+      const maxSize = 100 * 1024 * 1024;
+      if (f.size > maxSize) {
+        const proceed = confirm(`File is ${(f.size / 1024 / 1024).toFixed(1)}MB. Large files may be slow to process. Continue?`);
+        if (!proceed) {
+          audioFile.value = '';
+          return;
+        }
+      }
+
+      if (currentAudioURL) {
+        URL.revokeObjectURL(currentAudioURL);
+      }
+
+      currentAudioURL = URL.createObjectURL(f);
+      player.src = currentAudioURL;
+      player.playbackRate = Number(speedSel.value || 1);
+      fileName.textContent = f.name;
+      currentFileKey = 'transcriber-' + f.name;
+      loadLocal();
+      loopStart = null;
+      loopEnd = null;
+      doLoop = false;
+      loopA.textContent = '–';
+      loopB.textContent = '–';
+      toggleLoop.textContent = 'Loop: Off';
+
+      // Generate waveform
+      try {
+        const arrayBuffer = await f.arrayBuffer();
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        await drawWaveform(audioBuffer);
+        audioContext.close();
+      } catch (e) {
+        console.warn('Waveform generation failed:', e);
+        showToast('Audio loaded (waveform unavailable)', 'warning', 2000);
+      }
+
+      // Prompt for save location after audio loads
+      try {
+        const dirHandle = await window.showDirectoryPicker({
+          mode: 'readwrite',
+          startIn: 'documents'
+        });
+
+        // Create or get the transcript file
+        const transcriptFileName = f.name.replace(/\.[^/.]+$/, '') + '-transcript.txt';
+        autoSaveFileHandle = await dirHandle.getFileHandle(transcriptFileName, { create: true });
+
+        // Enable auto-save if not already enabled
+        if (enableAutoSaveBtn && !enableAutoSaveBtn.textContent.includes('Disable')) {
+          enableAutoSaveBtn.click();
+        }
+
+        showToast(`Transcription will be saved to: ${transcriptFileName}`, 'success', 3000);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.warn('Failed to set save location:', err);
+          showToast('Save location not set. You can still export manually.', 'warning', 3000);
+        }
+      }
+    });
+
+    // Handle audio load errors
+    player.addEventListener('error', (e) => {
+      let errorMsg = 'Failed to load audio file. ';
+      if (player.error) {
+        switch (player.error.code) {
+          case player.error.MEDIA_ERR_ABORTED:
+            errorMsg += 'Playback aborted.';
+            break;
+          case player.error.MEDIA_ERR_NETWORK:
+            errorMsg += 'Network error.';
+            break;
+          case player.error.MEDIA_ERR_DECODE:
+            errorMsg += 'File format not supported or corrupted.';
+            break;
+          case player.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+            errorMsg += 'File format not supported.';
+            break;
+        }
+      }
+      showToast(errorMsg, 'error', 5000);
+    });
+
+    // Waveform click to seek
+    waveformCanvas.addEventListener('click', (e) => {
+      if (!player.duration) return;
+      const rect = waveformCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const percent = x / rect.width;
+      player.currentTime = percent * player.duration;
+      updateTimeReadout();
+    });
+
+    // Progress bar interaction with preview
+    progressBar.addEventListener('mousemove', (e) => {
+      if (!player.duration) return;
+      const rect = progressBar.getBoundingClientRect();
+      const percent = ((e.clientX - rect.left) / rect.width) * 100;
+      const time = (percent / 100) * player.duration;
+      seekPreview.textContent = fmtTime(time);
+      seekPreview.style.left = `${e.clientX - rect.left}px`;
+      seekPreview.classList.add('visible');
+    });
+
+    progressBar.addEventListener('mouseleave', () => {
+      seekPreview.classList.remove('visible');
+    });
+
+    progressBar.addEventListener('input', () => {
+      if (player.duration) {
+        const seekTime = (progressBar.value / 100) * player.duration;
+        player.currentTime = seekTime;
+        updateTimeReadout();
+      }
+    });
+
+    // Playback controls
+    function skipBack() {
+      const s = Math.max(1, Number(skipBackSeconds.value) || 3);
+      player.currentTime = Math.max(0, player.currentTime - s);
+      updateTimeReadout();
+    }
+
+    function skipForward() {
+      const s = Math.max(1, Number(skipSeconds.value) || 5);
+      player.currentTime = Math.min(player.duration || 0, player.currentTime + s);
+      updateTimeReadout();
+    }
+
+    function togglePlay() {
+      if (player.paused) {
+        player.play().catch(err => {
+          console.warn('Playback failed:', err);
+          showToast('Playback failed. Try a different audio format.', 'error');
+        });
+      } else {
+        // Rewind on pause feature
+        const rewindAmount = Math.max(1, Number(skipBackSeconds.value) || 3);
+        player.currentTime = Math.max(0, player.currentTime - rewindAmount);
+        player.pause();
+        updateTimeReadout();
+      }
+    }
+
+    backBtn.addEventListener('click', skipBack);
+    fwdBtn.addEventListener('click', skipForward);
+    playBtn.addEventListener('click', togglePlay);
+    dockBack.addEventListener('click', skipBack);
+    dockFwd.addEventListener('click', skipForward);
+    dockPlay.addEventListener('click', togglePlay);
+
+    speedSel.addEventListener('change', () => {
+      player.playbackRate = Number(speedSel.value || 1);
+    });
+
+    // Volume control
+    volumeSlider.addEventListener('input', () => {
+      player.volume = volumeSlider.value / 100;
+    });
+
+    // Player events
+    player.addEventListener('timeupdate', () => {
+      updateTimeReadout();
+      updateProgress();
+      if (doLoop && loopStart != null && loopEnd != null) {
+        if (player.currentTime >= loopEnd) {
+          player.currentTime = loopStart;
+          player.play().catch(err => console.warn('Loop playback failed:', err));
+        }
+      }
+    });
+
+    player.addEventListener('loadedmetadata', () => {
+      updateTimeReadout();
+      progressBar.value = 0;
+      showToast('Audio loaded successfully', 'success', 2000);
+    });
+
+    player.addEventListener('play', () => {
+      playBtn.textContent = '⏸️ Pause';
+      dockPlay.textContent = '⏸️ Pause';
+    });
+
+    player.addEventListener('pause', () => {
+      playBtn.textContent = '▶️ Play';
+      dockPlay.textContent = '▶️ Play';
+    });
+
+    // Loop controls
+    setA.addEventListener('click', () => {
+      loopStart = player.currentTime;
+      loopA.textContent = fmtTime(loopStart);
+      showToast('Loop start set to ' + fmtTime(loopStart), 'success', 2000);
+    });
+
+    setB.addEventListener('click', () => {
+      const proposedEnd = player.currentTime;
+      if (loopStart === null) {
+        showToast('Please set loop start (A) first', 'warning', 2000);
+        return;
+      }
+      if (proposedEnd <= loopStart) {
+        showToast('Loop end must be after loop start', 'error', 2000);
+        return;
+      }
+      loopEnd = proposedEnd;
+      loopB.textContent = fmtTime(loopEnd);
+      showToast('Loop end set to ' + fmtTime(loopEnd), 'success', 2000);
+    });
+
+    toggleLoop.addEventListener('click', () => {
+      if (!doLoop && loopStart === null) {
+        showToast('Please set loop points (A and B) first', 'warning', 2000);
+        return;
+      }
+      doLoop = !doLoop;
+      toggleLoop.textContent = 'Loop: ' + (doLoop ? 'On' : 'Off');
+      if (doLoop && loopStart != null) {
+        player.currentTime = loopStart;
+        player.play().catch(err => console.warn('Loop start failed:', err));
+        showToast('Looping enabled', 'success', 2000);
+      } else if (!doLoop) {
+        showToast('Looping disabled', 'info', 2000);
+      }
+    });
+
+    // Auto-pause on typing
+    autoPauseCheck.addEventListener('change', () => {
+      autoPauseEnabled = autoPauseCheck.checked;
+      if (autoPauseEnabled) {
+        showToast('Auto-pause enabled', 'success', 2000);
+      } else {
+        showToast('Auto-pause disabled', 'info', 2000);
+      }
+    });
+
+    // Editor features
+    insertTs.addEventListener('click', () => {
+      const ts = '[' + fmtTime(player.currentTime) + '] ';
+      const start = editor.selectionStart;
+      const end = editor.selectionEnd;
+      editor.setRangeText(ts, start, end, 'end');
+      editor.focus();
+      updateCounts();
+      saveLocal();
+    });
+
+    function insertSpeaker(label) {
+      const start = editor.selectionStart;
+      const end = editor.selectionEnd;
+      const prefix = start > 0 && editor.value[start - 1] !== '\n' ? '\n' : '';
+      editor.setRangeText(prefix + label + ' ', start, end, 'end');
+      editor.focus();
+      updateCounts();
+      saveLocal();
+
+      // Track speaker numbers for auto-increment
+      const match = label.match(/Speaker (\d+):/);
+      if (match) {
+        lastSpeakerNumber = Math.max(lastSpeakerNumber, parseInt(match[1]));
+      }
+    }
+
+    speakerPreset.addEventListener('change', () => {
+      const val = speakerPreset.value;
+      if (!val) return;
+      insertSpeaker(val);
+      speakerPreset.selectedIndex = 0;
+    });
+
+    markBtn.addEventListener('click', () => {
+      const tag = ' [UNCLEAR] ';
+      const start = editor.selectionStart;
+      const end = editor.selectionEnd;
+      editor.setRangeText(tag, start, end, 'end');
+      editor.focus();
+      updateCounts();
+      saveLocal();
+    });
+
+    let typingTimeout;
+    editor.addEventListener('input', () => {
+      updateCounts();
+
+      // Auto-pause on typing
+      if (autoPauseEnabled && !player.paused) {
+        wasPlayingBeforeTyping = true;
+        player.pause();
+      }
+
+      // Clear previous timeout
+      clearTimeout(typingTimeout);
+
+      // Resume after 2 seconds of no typing
+      if (autoPauseEnabled && wasPlayingBeforeTyping) {
+        typingTimeout = setTimeout(() => {
+          if (wasPlayingBeforeTyping) {
+            player.play().catch(err => console.warn('Auto-resume failed:', err));
+            wasPlayingBeforeTyping = false;
+          }
+        }, 2000);
+      }
+
+      saveLocal();
+    });
+
+    // Track changes for undo/redo
+    let changeTimeout;
+    editor.addEventListener('input', () => {
+      clearTimeout(changeTimeout);
+      changeTimeout = setTimeout(() => {
+        pushUndoState(editor.value);
+      }, 500);
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(editor.value);
+        copyBtn.textContent = 'Copied ✔';
+        showToast('Text copied to clipboard', 'success', 2000);
+        setTimeout(() => copyBtn.textContent = 'Copy text', 1000);
+      } catch (e) {
+        showToast('Copy failed. Use Export .txt instead.', 'error');
+      }
+    });
+
+    function download(filename, text, type = 'text/plain') {
+      const blob = new Blob([text], {type});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    // Auto-save to file function
+    async function setupAutoSaveToFile() {
+      try {
+        // Check if File System Access API is supported
+        if (!window.showSaveFilePicker) {
+          showToast('Auto-save to file not supported in this browser. Use Chrome/Edge.', 'warning', 5000);
+          return;
+        }
+
+        const base = (fileName.textContent || 'audio').replace(/\.[^/.]+$/, '');
+        const suggestedName = `${base}-transcript.txt`;
+
+        const opts = {
+          suggestedName: suggestedName,
+          types: [{
+            description: 'Text Files',
+            accept: {'text/plain': ['.txt']},
+          }],
+        };
+
+        autoSaveFileHandle = await window.showSaveFilePicker(opts);
+        autoSaveEnabled = true;
+
+        // Update button
+        enableAutoSaveBtn.textContent = 'Auto-save: Enabled ✓';
+        enableAutoSaveBtn.disabled = true;
+        enableAutoSaveBtn.style.opacity = '0.7';
+
+        // Perform initial save
+        await saveToFile();
+        showToast('Auto-save enabled. Saving every 60 seconds.', 'success', 3000);
+
+        // Start auto-save interval (60 seconds)
+        if (autoSaveInterval) clearInterval(autoSaveInterval);
+        autoSaveInterval = setInterval(async () => {
+          if (autoSaveEnabled && autoSaveFileHandle) {
+            await saveToFile();
+          }
+        }, 60000); // 60 seconds
+
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error('Auto-save setup failed:', err);
+          showToast('Auto-save setup cancelled or failed.', 'warning', 3000);
+        }
+        autoSaveEnabled = false;
+      }
+    }
+
+    async function saveToFile() {
+      if (!autoSaveFileHandle || !autoSaveEnabled) return;
+
+      try {
+        const writable = await autoSaveFileHandle.createWritable();
+        await writable.write(editor.value);
+        await writable.close();
+        showToast('Auto-saved to file ✓', 'success', 1500);
+      } catch (err) {
+        console.error('Auto-save failed:', err);
+        showToast('Auto-save failed. File may be open elsewhere.', 'error', 3000);
+      }
+    }
+
+    // Enable auto-save to file button
+    enableAutoSaveBtn.addEventListener('click', () => {
+      setupAutoSaveToFile();
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      const base = (fileName.textContent || 'audio').replace(/\.[^/.]+$/, '');
+      download(`${base}-transcript.txt`, editor.value);
+      showToast('Transcript exported', 'success', 2000);
+    });
+
+    // Export as SRT subtitle file
+    downloadSrtBtn.addEventListener('click', () => {
+      const text = editor.value;
+      const timestampRegex = /\[(\d{1,2}:\d{2}:\d{2}|\d{1,2}:\d{2})\]/g;
+      const lines = text.split('\n');
+      let srtContent = '';
+      let subtitleIndex = 1;
+      let currentTime = 0;
+      let currentText = '';
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        const matches = [...line.matchAll(timestampRegex)];
+
+        if (matches.length > 0) {
+          // Save previous subtitle if exists
+          if (currentText) {
+            const endTime = parseTimestamp(matches[0][1]);
+            srtContent += `${subtitleIndex}\n`;
+            srtContent += `${fmtTimeSrt(currentTime)} --> ${fmtTimeSrt(endTime)}\n`;
+            srtContent += `${currentText}\n\n`;
+            subtitleIndex++;
+          }
+
+          // Start new subtitle
+          currentTime = parseTimestamp(matches[0][1]);
+          currentText = line.replace(timestampRegex, '').trim();
+        } else if (currentText) {
+          currentText += ' ' + line;
+        }
+      }
+
+      // Add final subtitle
+      if (currentText) {
+        srtContent += `${subtitleIndex}\n`;
+        srtContent += `${fmtTimeSrt(currentTime)} --> ${fmtTimeSrt(currentTime + 5)}\n`;
+        srtContent += `${currentText}\n\n`;
+      }
+
+      if (srtContent) {
+        const base = (fileName.textContent || 'audio').replace(/\.[^/.]+$/, '');
+        download(`${base}-subtitles.srt`, srtContent, 'text/srt');
+        showToast('SRT subtitles exported', 'success', 2000);
+      } else {
+        showToast('No timestamps found. Add timestamps to create SRT file.', 'warning', 3000);
+      }
+    });
+
+    function parseTimestamp(ts) {
+      const parts = ts.split(':').map(Number);
+      if (parts.length === 2) {
+        return parts[0] * 60 + parts[1];
+      } else if (parts.length === 3) {
+        return parts[0] * 3600 + parts[1] * 60 + parts[2];
+      }
+      return 0;
+    }
+
+    saveBtn.addEventListener('click', () => {
+      saveLocal();
+      saveBtn.textContent = 'Saved ✔';
+      showToast('Draft saved', 'success', 2000);
+      setTimeout(() => saveBtn.textContent = 'Save draft', 1000);
+    });
+
+    importBtn.addEventListener('click', () => importFile.click());
+    importFile.addEventListener('change', async () => {
+      const f = importFile.files?.[0];
+      if (!f) return;
+      pushUndoState(editor.value);
+      const text = await f.text();
+      editor.value = text;
+      updateCounts();
+      saveLocal();
+      showToast('File imported', 'success', 2000);
+    });
+
+    // Search functionality
+    searchInput.addEventListener('input', performSearch);
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          searchPrevMatch();
+        } else {
+          searchNextMatch();
+        }
+      }
+    });
+    searchNext.addEventListener('click', searchNextMatch);
+    searchPrev.addEventListener('click', searchPrevMatch);
+
+    // Undo/Redo buttons
+    undoBtn.addEventListener('click', undo);
+    redoBtn.addEventListener('click', redo);
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      const isTyping = e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT';
+
+      // Space works when NOT typing, Shift+Space works ALWAYS (even when typing)
+      if (e.code === 'Space' && (!isTyping || e.shiftKey)) {
+        e.preventDefault();
+        togglePlay();
+      }
+
+      // Escape key to blur/unfocus from text fields (allows other shortcuts to work)
+      if (e.key === 'Escape' && isTyping) {
+        e.target.blur();
+      }
+
+      if (e.key === 'ArrowLeft' && !isTyping) {
+        e.preventDefault();
+        skipBack();
+      }
+
+      if (e.key === 'ArrowRight' && !isTyping) {
+        e.preventDefault();
+        skipForward();
+      }
+
+      // P for Play/Pause toggle
+      if (e.key === 'p' && !isTyping) {
+        e.preventDefault();
+        togglePlay();
+      }
+
+      // Ctrl + Shift + I for Interviewer
+      if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+        e.preventDefault();
+        insertSpeaker('Interviewer:');
+      }
+
+      // Ctrl + Shift + S for Speaker (with auto-increment)
+      if (e.ctrlKey && e.shiftKey && e.key === 'S') {
+        e.preventDefault();
+        if (lastSpeakerNumber === 0) {
+          insertSpeaker('Speaker:');
+        } else {
+          lastSpeakerNumber++;
+          insertSpeaker(`Speaker ${lastSpeakerNumber}:`);
+        }
+      }
+
+      // Cmd/Ctrl + E for Export
+      if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+        e.preventDefault();
+        downloadBtn.click();
+      }
+
+      // Cmd/Ctrl + Z for Undo
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+      }
+
+      // Cmd/Ctrl + Shift + Z for Redo
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'Z') {
+        e.preventDefault();
+        redo();
+      }
+
+      // Cmd/Ctrl + F for Find
+      if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+      }
+    });
+
+    // Initialize
+    updateCounts();
+    loadLocal();
+    saveLocal();
+    pushUndoState(editor.value);
+    updateUndoRedoButtons();
+
+    // Window resize handler
+    window.addEventListener('resize', updateCounts);
+
+    // Request persistent storage
+    (async () => {
+      try {
+        if (navigator.storage?.persist) {
+          const granted = await navigator.storage.persist();
+          persistStatus.textContent = granted ? 'persistent' : 'temporary';
+          if (!granted) {
+            showToast('Storage is temporary. Data may be cleared by browser.', 'warning', 4000);
+          }
+        } else {
+          persistStatus.textContent = 'temporary';
+        }
+        checkStorageQuota();
+      } catch {
+        persistStatus.textContent = 'temporary';
+      }
+    })();
+
+    // Show environment warning
+    try {
+      const ua = navigator.userAgent || '';
+      const inApp = /FBAN|FBAV|Instagram|Line\//i.test(ua);
+      if (inApp) {
+        document.getElementById('envWarning').style.display = 'block';
+      }
+    } catch {}
+
+    // Cleanup on unload
+    window.addEventListener('beforeunload', () => {
+      if (currentAudioURL) URL.revokeObjectURL(currentAudioURL);
+    });
+  </script>
+</body>
+</html>
