@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>HEP Transcriber v2</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #22c55e;
+      --danger: #ef4444;
+      --btn: #334155;
+    }
+    * { 
+      box-sizing: border-box; 
+      margin: 0;
+      padding: 0;
+    }
+    html, body { 
+      width: 100%; 
+      overflow-x: hidden; 
+      -webkit-text-size-adjust: 100%; 
+    }
+    body { 
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji"; 
+      background: var(--bg); 
+      color: var(--text);
+      line-height: 1.5;
+    }
+    
+    /* Header */
+    header { 
+      background: linear-gradient(180deg, #0b1224 0%, #0f172a 100%); 
+      padding: 12px; 
+      border-bottom: 1px solid #1f2937; 
+    }
+    h1 { 
+      font-size: 18px; 
+      font-weight: 600;
+    }
+    .sub { 
+      color: var(--muted); 
+      font-size: 12px; 
+      margin-top: 2px; 
+    }
+
+    /* Main container - mobile first */
+    main { 
+      padding: 12px; 
+      max-width: 900px; 
+      margin: 0 auto 100px;
+    }
+
+    /* Cards */
+    .card { 
+      background: var(--panel); 
+      border: 1px solid #1f2937; 
+      border-radius: 14px; 
+      padding: 12px; 
+      margin-bottom: 12px;
+    }
+
+    /* Form elements */
+    input[type="file"], 
+    input[type="number"], 
+    select, 
+    button { 
+      background: var(--panel-2); 
+      color: var(--text); 
+      border: 1px solid #374151; 
+      border-radius: 10px; 
+      padding: 10px 12px; 
+      font-size: 16px; 
+      font-family: inherit;
+    }
+    
+    input[type="file"] { 
+      width: 100%;
+      margin: 8px 0;
+    }
+    
+    input[type="number"] { 
+      width: 70px; 
+    }
+    
+    select {
+      min-width: 0;
+      flex: 1;
+    }
+
+    button { 
+      cursor: pointer; 
+      border: 1px solid #4b5563; 
+      transition: opacity 0.2s;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    button:hover { 
+      opacity: 0.9; 
+    }
+    button.primary { 
+      background: var(--accent); 
+      color: #052e16; 
+      border-color: #16a34a; 
+      font-weight: 600;
+    }
+    button.ghost { 
+      background: transparent; 
+    }
+    button.danger { 
+      background: var(--danger); 
+      color: #fff; 
+      border-color: #b91c1c; 
+    }
+
+    /* Audio controls section */
+    .audio-info {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .audio-settings {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .time-display {
+      margin-left: auto;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* Progress bar */
+    .progress-container {
+      margin: 12px 0;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--panel-2);
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+    
+    .progress-bar::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    
+    .progress-bar::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+    }
+    
+    .progress-time {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Main control buttons - two rows on mobile */
+    .controls { 
+      display: flex;
+      flex-direction: column;
+      gap: 8px; 
+      margin: 12px 0;
+    }
+    
+    .controls-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    
+    .controls button { 
+      padding: 12px 8px; 
+      font-weight: 600; 
+      border-radius: 12px;
+      font-size: 14px;
+    }
+    
+    .controls .wide { 
+      grid-column: span 1; 
+    }
+
+    /* Loop info */
+    .loop-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* Editor */
+    textarea { 
+      width: 100%; 
+      min-height: 40vh; 
+      resize: vertical; 
+      background: var(--panel-2); 
+      border: 1px solid #374151; 
+      color: var(--text); 
+      padding: 12px; 
+      border-radius: 12px; 
+      line-height: 1.45; 
+      font-size: 16px;
+      font-family: inherit;
+      margin: 8px 0;
+    }
+
+    /* Editor toolbar - 2 column grid on mobile */
+    .toolbar { 
+      display: grid; 
+      grid-template-columns: repeat(2, 1fr); 
+      gap: 8px; 
+    }
+    .toolbar button, 
+    .toolbar select { 
+      padding: 10px; 
+      border-radius: 12px;
+      font-size: 14px;
+    }
+
+    /* Status indicators */
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge { 
+      display: inline-block; 
+      padding: 2px 8px; 
+      border-radius: 999px; 
+      background: #0b4; 
+      color: #041; 
+      font-weight: 700; 
+      font-size: 11px;
+      transition: background 0.3s;
+    }
+    .badge.error { 
+      background: #ef4444; 
+      color: #fff; 
+    }
+
+    /* Help section */
+    .hint { 
+      font-size: 13px; 
+      color: var(--muted); 
+      line-height: 1.6;
+    }
+    .hint ul {
+      margin: 8px 0;
+      padding-left: 20px;
+    }
+    .hint li {
+      margin: 4px 0;
+    }
+    
+    .kbd { 
+      background: #111; 
+      border: 1px solid #333; 
+      border-bottom-width: 2px; 
+      padding: 2px 6px; 
+      border-radius: 6px; 
+      font-size: 11px;
+      display: inline-block;
+    }
+
+    /* Labels */
+    .label {
+      font-size: 12px;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 4px;
+    }
+    
+    .section-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    /* Footer */
+    .footer { 
+      text-align: center; 
+      color: var(--muted); 
+      font-size: 11px; 
+      padding: 20px 12px 120px;
+    }
+
+    /* Mobile dock */
+    .mobile-dock {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 50;
+      background: var(--panel);
+      border-top: 1px solid #1f2937;
+      padding: 8px 12px;
+    } 
+    .dock-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    } 
+    .mobile-dock button {
+      padding: 14px 8px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    /* Environment warning */
+    .warning {
+      background: #7c2d12;
+      color: #fff;
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    /* Tablet and desktop adjustments */
+    @media (min-width: 640px) {
+      main {
+        padding: 16px;
+      }
+      
+      .card {
+        padding: 16px;
+      }
+      
+      /* Desktop - single row controls */
+      .controls {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 8px;
+      }
+      
+      .controls-row {
+        display: contents;
+      }
+      
+      /* 4 column grid for toolbar on larger screens */
+      .toolbar {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      
+      .audio-settings {
+        flex-wrap: nowrap;
+      }
+      
+      textarea {
+        min-height: 50vh;
+      }
+    }
+    
+    /* Desktop adjustments */
+    @media (min-width: 880px) {
+      .mobile-dock { 
+        display: none; 
+      }
+      
+      main {
+        margin-bottom: 40px;
+      }
+      
+      .grid-two { 
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      
+      .footer {
+        padding-bottom: 40px;
+      }
+    }
+    
+    /* Safe area insets for modern phones */
+    @supports (padding: max(0px)) {
+      body { 
+        padding-left: env(safe-area-inset-left); 
+        padding-right: env(safe-area-inset-right); 
+      }
+      .mobile-dock { 
+        padding-bottom: max(8px, env(safe-area-inset-bottom)); 
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>HEP Transcriber v2</h1>
+    <div class="sub">Play audio + type the transcript on one screen. Everything stays on your phone (local only).</div>
+  </header>
+
+  <div id="envWarning" class="warning" style="display:none;">
+    If the file picker doesn't open: tap the three dots ··· and choose <strong>Open in Chrome</strong>, or copy the link and open it in Chrome. Some in‑app browsers (WhatsApp/Instagram/Twitter) block file uploads. Also make sure the audio is saved on the phone (Downloads/Files), not just online in Drive.
+  </div>
+
+  <main>
+    <!-- Audio controls card -->
+    <div class="card">
+      <div class="audio-info">
+        <label class="label" for="audioFile">1) Choose audio file</label>
+        <input id="audioFile" type="file" accept=".mp3,.m4a,.aac,.wav,.ogg,.oga,.3gp,.m4b,audio/*" />
+        <div id="fileName" class="label"></div>
+        
+        <div class="audio-settings">
+          <label class="label">Fwd secs</label>
+          <input id="skipSeconds" type="number" value="5" min="1" max="30" />
+          <label class="label">Speed</label>
+          <select id="speed">
+            <option value="0.5">0.5×</option>
+            <option value="0.7">0.7×</option>
+            <option value="0.8">0.8×</option>
+            <option value="0.9">0.9×</option>
+            <option value="1" selected>1×</option>
+            <option value="1.1">1.1×</option>
+            <option value="1.25">1.25×</option>
+            <option value="1.5">1.5×</option>
+          </select>
+          <span id="timeReadout" class="time-display">00:00 / 00:00</span>
+        </div>
+      </div>
+
+      <audio id="player" preload="metadata" style="width:0;height:0;opacity:0;position:absolute;pointer-events:none;" playsinline disablepictureinpicture controlslist="nodownload noplaybackrate noremoteplayback"></audio>
+
+      <!-- Progress bar -->
+      <div class="progress-container">
+        <input type="range" id="progressBar" class="progress-bar" min="0" max="100" value="0" step="0.1">
+        <div class="progress-time">
+          <span id="currentTime">00:00</span>
+          <span id="duration">00:00</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="controls-row">
+          <button id="backBtn">⏪ Back</button>
+          <button id="playBtn" class="primary">▶️ Play</button>
+          <button id="fwdBtn">⏩ Fwd</button>
+        </div>
+        <div class="controls-row">
+          <button id="setA">Set A</button>
+          <button id="setB">Set B</button>
+          <button id="toggleLoop" class="ghost">Loop: Off</button>
+        </div>
+      </div>
+
+      <div class="loop-info">
+        <div>Loop A: <span id="loopA">–</span> | B: <span id="loopB">–</span></div>
+        <div>Autosave: <span class="badge" id="autosaveBadge">ON</span></div>
+      </div>
+    </div>
+
+    <div class="grid-two">
+      <!-- Editor card -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span class="section-title">2) Type transcript here</span>
+          <span class="label" id="countInfo">0 chars</span>
+        </div>
+        
+        <textarea id="editor" placeholder="Type what you hear… You can insert timestamps, add speaker labels, and save when done."></textarea>
+        
+        <div class="toolbar">
+          <button id="insertTs">Timestamp</button>
+          <select id="speakerPreset">
+            <option value="">Speaker…</option>
+            <option>Interviewer:</option>
+            <option>Translator:</option>
+            <option>Speaker 1:</option>
+            <option>Speaker 2:</option>
+          </select>
+          <button id="saveBtn" class="ghost">Save draft</button>
+          <button id="copyBtn">Copy text</button>
+          <button id="clearBtn" class="danger">Clear</button>
+          <button id="downloadBtn" class="primary wide">Export .txt</button>
+          <button id="markBtn" class="wide">Mark unclear</button>
+          <button id="importBtn">Import .txt</button>
+        </div>
+        <input id="importFile" type="file" accept=".txt" hidden />
+        
+        <div class="status-row">
+          <div>Saved: <span id="saveStamp">never</span></div>
+          <div>Storage: <span id="persistStatus">checking…</span></div>
+        </div>
+        
+        <div class="hint" style="margin-top: 12px;">
+          Tips: Use Back/Forward to skip. Slow the speed if needed. Set A and B define a loop. Timestamp inserts the current audio time like [00:03:12]. Everything auto‑saves on your device.
+        </div>
+      </div>
+
+      <!-- Help card -->
+      <div class="card">
+        <span class="section-title">3) Quick help</span>
+        <div class="hint">
+          <ul>
+            <li>Load an <strong>audio file</strong> from your phone (MP3, M4A, WAV, etc.).</li>
+            <li>Press <strong>Play</strong>, then pause and rewind to transcribe.</li>
+            <li><strong>Insert timestamp</strong> adds the current time to your text.</li>
+            <li><strong>Loop</strong>: Set A and B, then toggle Loop. Great for tricky parts.</li>
+            <li><strong>Autosave</strong> keeps your draft locally (works offline).</li>
+            <li><strong>Privacy</strong>: No uploads. Everything stays on your device.</li>
+          </ul>
+          <div style="margin-top: 8px;">
+            Keyboard shortcuts: <span class="kbd">Space</span> Play/Pause, 
+            <span class="kbd">←</span>/<span class="kbd">→</span> Skip, 
+            <span class="kbd">Ctrl+S</span> Download
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      HEP Transcriber v2 • Local‑only, single‑file tool<br>
+      © Hope Education Project Ghana 2025
+    </div>
+  </main>
+
+  <!-- Mobile dock -->
+  <div class="mobile-dock">
+    <div class="dock-grid">
+      <button id="dockBack">⏪ Back</button>
+      <button id="dockPlay" class="primary">▶️ Play</button>
+      <button id="dockFwd">⏩ Fwd</button>
+    </div>
+  </div>
+
+  <script>
+    // DOM elements
+    const player = document.getElementById('player');
+    const progressBar = document.getElementById('progressBar');
+    const currentTimeDisplay = document.getElementById('currentTime');
+    const durationDisplay = document.getElementById('duration');
+    const audioFile = document.getElementById('audioFile');
+    const fileName = document.getElementById('fileName');
+    const backBtn = document.getElementById('backBtn');
+    const playBtn = document.getElementById('playBtn');
+    const fwdBtn = document.getElementById('fwdBtn');
+    const skipSeconds = document.getElementById('skipSeconds');
+    const speedSel = document.getElementById('speed');
+    const timeReadout = document.getElementById('timeReadout');
+    const setA = document.getElementById('setA');
+    const setB = document.getElementById('setB');
+    const toggleLoop = document.getElementById('toggleLoop');
+    const loopA = document.getElementById('loopA');
+    const loopB = document.getElementById('loopB');
+    const editor = document.getElementById('editor');
+    const insertTs = document.getElementById('insertTs');
+    const speakerPreset = document.getElementById('speakerPreset');
+    const copyBtn = document.getElementById('copyBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const markBtn = document.getElementById('markBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const importBtn = document.getElementById('importBtn');
+    const importFile = document.getElementById('importFile');
+    const saveStamp = document.getElementById('saveStamp');
+    const persistStatus = document.getElementById('persistStatus');
+    const autosaveBadge = document.getElementById('autosaveBadge');
+    const countInfo = document.getElementById('countInfo');
+    const dockBack = document.getElementById('dockBack');
+    const dockPlay = document.getElementById('dockPlay');
+    const dockFwd = document.getElementById('dockFwd');
+
+    // State variables
+    let loopStart = null;
+    let loopEnd = null;
+    let doLoop = false;
+    let currentFileKey = 'transcriber-default';
+    let currentAudioURL = null;
+
+    // Utility functions
+    function fmtTime(t) {
+      if (!isFinite(t)) return '00:00';
+      const h = Math.floor(t / 3600);
+      const m = Math.floor((t % 3600) / 60);
+      const s = Math.floor(t % 60);
+      const hh = h > 0 ? String(h).padStart(2, '0') + ':' : '';
+      return hh + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    }
+
+    function updateTimeReadout() {
+      timeReadout.textContent = `${fmtTime(player.currentTime)} / ${fmtTime(player.duration)}`;
+      currentTimeDisplay.textContent = fmtTime(player.currentTime);
+      durationDisplay.textContent = fmtTime(player.duration);
+    }
+
+    function updateProgress() {
+      if (player.duration) {
+        const percent = (player.currentTime / player.duration) * 100;
+        progressBar.value = percent;
+      }
+    }
+
+    function updateCounts() {
+      const text = editor.value;
+      const chars = text.length;
+      const words = (text.trim().match(/\S+/g) || []).length;
+      countInfo.textContent = window.innerWidth > 480 
+        ? `${chars} chars • ${words} words`
+        : `${chars} chars`;
+    }
+
+    function saveLocal() {
+      try {
+        localStorage.setItem(currentFileKey, editor.value);
+        localStorage.setItem('transcriber-active', editor.value);
+        autosaveBadge.textContent = 'ON';
+        autosaveBadge.classList.remove('error');
+        if (saveStamp) saveStamp.textContent = new Date().toLocaleTimeString();
+      } catch (e) {
+        autosaveBadge.textContent = 'FAIL';
+        autosaveBadge.classList.add('error');
+        console.error('Autosave failed:', e);
+      }
+    }
+
+    function loadLocal() {
+      let v = localStorage.getItem(currentFileKey);
+      if (!v) v = localStorage.getItem('transcriber-active');
+      if (v) {
+        editor.value = v;
+        updateCounts();
+      }
+    }
+
+    // Audio file handling
+    audioFile.addEventListener('change', () => {
+      const f = audioFile.files?.[0];
+      if (!f) {
+        alert('No file selected. If the picker didn\'t appear, open this page in Chrome (not an in‑app browser) and make sure the audio is stored locally.');
+        return;
+      }
+      
+      if (currentAudioURL) {
+        URL.revokeObjectURL(currentAudioURL);
+      }
+      
+      currentAudioURL = URL.createObjectURL(f);
+      player.src = currentAudioURL;
+      player.playbackRate = Number(speedSel.value || 1);
+      fileName.textContent = f.name;
+      currentFileKey = 'transcriber-' + f.name;
+      loadLocal();
+      loopStart = null; 
+      loopEnd = null; 
+      doLoop = false;
+      loopA.textContent = '–'; 
+      loopB.textContent = '–'; 
+      toggleLoop.textContent = 'Loop: Off';
+    });
+
+    // Progress bar interaction
+    progressBar.addEventListener('input', () => {
+      if (player.duration) {
+        const seekTime = (progressBar.value / 100) * player.duration;
+        player.currentTime = seekTime;
+        updateTimeReadout();
+      }
+    });
+
+    // Playback controls
+    function skipBack() {
+      const s = Math.max(1, Number(skipSeconds.value) || 5);
+      player.currentTime = Math.max(0, player.currentTime - s);
+      updateTimeReadout();
+    }
+
+    function skipForward() {
+      const s = Math.max(1, Number(skipSeconds.value) || 5);
+      player.currentTime = Math.min(player.duration || 0, player.currentTime + s);
+      updateTimeReadout();
+    }
+
+    function togglePlay() {
+      if (player.paused) {
+        player.play().catch(err => {
+          console.warn('Playback failed:', err);
+        });
+      } else {
+        player.pause();
+      }
+    }
+
+    backBtn.addEventListener('click', skipBack);
+    fwdBtn.addEventListener('click', skipForward);
+    playBtn.addEventListener('click', togglePlay);
+    dockBack.addEventListener('click', skipBack);
+    dockFwd.addEventListener('click', skipForward);
+    dockPlay.addEventListener('click', togglePlay);
+
+    speedSel.addEventListener('change', () => {
+      player.playbackRate = Number(speedSel.value || 1);
+    });
+
+    // Player events
+    player.addEventListener('timeupdate', () => {
+      updateTimeReadout();
+      updateProgress();
+      if (doLoop && loopStart != null && loopEnd != null) {
+        if (player.currentTime >= loopEnd) {
+          player.currentTime = loopStart;
+          player.play().catch(err => console.warn('Loop playback failed:', err));
+        }
+      }
+    });
+
+    player.addEventListener('loadedmetadata', () => {
+      updateTimeReadout();
+      progressBar.value = 0;
+    });
+    
+    player.addEventListener('play', () => { 
+      playBtn.textContent = '⏸️ Pause';
+      dockPlay.textContent = '⏸️ Pause';
+    });
+    
+    player.addEventListener('pause', () => { 
+      playBtn.textContent = '▶️ Play';
+      dockPlay.textContent = '▶️ Play';
+    });
+
+    // Loop controls
+    setA.addEventListener('click', () => {
+      loopStart = player.currentTime;
+      loopA.textContent = fmtTime(loopStart);
+    });
+    
+    setB.addEventListener('click', () => {
+      const proposedEnd = player.currentTime;
+      if (loopStart !== null && proposedEnd <= loopStart) {
+        alert('Loop end must be after loop start');
+        return;
+      }
+      loopEnd = proposedEnd;
+      loopB.textContent = fmtTime(loopEnd);
+    });
+    
+    toggleLoop.addEventListener('click', () => {
+      doLoop = !doLoop;
+      toggleLoop.textContent = 'Loop: ' + (doLoop ? 'On' : 'Off');
+      if (doLoop && loopStart != null) {
+        player.currentTime = loopStart;
+        player.play().catch(err => console.warn('Loop start failed:', err));
+      }
+    });
+
+    // Editor features
+    insertTs.addEventListener('click', () => {
+      const ts = '[' + fmtTime(player.currentTime) + '] ';
+      const start = editor.selectionStart;
+      const end = editor.selectionEnd;
+      editor.setRangeText(ts, start, end, 'end');
+      updateCounts();
+      saveLocal();
+    });
+
+    speakerPreset.addEventListener('change', () => {
+      const val = speakerPreset.value;
+      if (!val) return;
+      const start = editor.selectionStart;
+      const end = editor.selectionEnd;
+      editor.setRangeText((start > 0 ? '\n' : '') + val + ' ', start, end, 'end');
+      speakerPreset.selectedIndex = 0;
+      updateCounts();
+      saveLocal();
+    });
+
+    markBtn.addEventListener('click', () => {
+      const tag = ' [UNCLEAR] ';
+      const start = editor.selectionStart;
+      const end = editor.selectionEnd;
+      editor.setRangeText(tag, start, end, 'end');
+      updateCounts();
+      saveLocal();
+    });
+
+    editor.addEventListener('input', () => { 
+      updateCounts(); 
+      saveLocal(); 
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(editor.value);
+        copyBtn.textContent = 'Copied ✔';
+        setTimeout(() => copyBtn.textContent = 'Copy text', 1000);
+      } catch (e) {
+        alert('Copy failed. Use Export .txt instead.');
+      }
+    });
+
+    clearBtn.addEventListener('click', () => {
+      if (!confirm('Clear all text?')) return;
+      editor.value = '';
+      updateCounts();
+      saveLocal();
+    });
+
+    function download(filename, text) {
+      const blob = new Blob([text], {type: 'text/plain'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    downloadBtn.addEventListener('click', () => {
+      const base = (fileName.textContent || 'audio').replace(/\.[^/.]+$/, '');
+      download(`${base}-transcript.txt`, editor.value);
+    });
+
+    saveBtn.addEventListener('click', () => {
+      saveLocal();
+      saveBtn.textContent = 'Saved ✔';
+      setTimeout(() => saveBtn.textContent = 'Save draft', 1000);
+    });
+
+    importBtn.addEventListener('click', () => importFile.click());
+    importFile.addEventListener('change', async () => {
+      const f = importFile.files?.[0];
+      if (!f) return;
+      const text = await f.text();
+      editor.value = text;
+      updateCounts();
+      saveLocal();
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      const isTyping = e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT';
+      
+      if (e.code === 'Space' && !isTyping) {
+        e.preventDefault();
+        togglePlay();
+      }
+      
+      if (e.key === 'ArrowLeft' && !isTyping) {
+        e.preventDefault();
+        skipBack();
+      }
+      
+      if (e.key === 'ArrowRight' && !isTyping) {
+        e.preventDefault();
+        skipForward();
+      }
+      
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        downloadBtn.click();
+      }
+    });
+
+    // Initialize
+    updateCounts();
+    loadLocal();
+    saveLocal();
+
+    // Window resize handler
+    window.addEventListener('resize', updateCounts);
+
+    // Request persistent storage
+    (async () => {
+      try {
+        if (navigator.storage?.persist) {
+          const granted = await navigator.storage.persist();
+          persistStatus.textContent = granted ? 'persistent' : 'temporary';
+        } else {
+          persistStatus.textContent = 'temporary';
+        }
+      } catch {
+        persistStatus.textContent = 'temporary';
+      }
+    })();
+
+    // Show environment warning
+    try {
+      const ua = navigator.userAgent || '';
+      const inApp = /FBAN|FBAV|Instagram|Line\//i.test(ua);
+      if (inApp) {
+        document.getElementById('envWarning').style.display = 'block';
+      }
+    } catch {}
+
+    // Cleanup on unload
+    window.addEventListener('beforeunload', () => {
+      if (currentAudioURL) URL.revokeObjectURL(currentAudioURL);
+    });
+  </script>
+</body>
+</html>
